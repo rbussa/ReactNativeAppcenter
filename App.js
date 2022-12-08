@@ -7,8 +7,10 @@
  */
 
 import React from 'react';
-import type {Node} from 'react';
+import Crashes from 'appcenter-crashes';
+
 import {
+  Button,
   SafeAreaView,
   ScrollView,
   StatusBar,
@@ -54,33 +56,37 @@ const Section = ({children, title}): Node => {
   );
 };
 
-const App: () => Node = () => {
-  const isDarkMode = useColorScheme() === 'dark';
+// const App: () => Node = () => {
+//   const isDarkMode = useColorScheme() === 'dark';
 
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
+//   const backgroundStyle = {
+//     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
+//   };
 
-  return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Text>Hello World</Text>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
-  );
-};
+//   return (
+
+//   );
+// };
+
+export default class App extends React.Component {
+  render() {
+    return (
+      <SafeAreaView>
+        <StatusBar />
+        <ScrollView contentInsetAdjustmentBehavior="automatic">
+          <Header />
+          <View>
+            <Text>Hello World</Text>
+            <Button
+              title="Crash App"
+              onPress={() => Crashes.generateTestCrash()}
+            />
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+    );
+  }
+}
 
 const styles = StyleSheet.create({
   sectionContainer: {
@@ -100,5 +106,3 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
 });
-
-export default App;
