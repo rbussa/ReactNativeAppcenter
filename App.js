@@ -7,6 +7,7 @@
  */
 
 import React from 'react';
+import 'react-native-gesture-handler';
 import Crashes from 'appcenter-crashes';
 
 import {
@@ -27,68 +28,92 @@ import {
   LearnMoreLinks,
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
+import {
+  Provider as PaperProvider,
+  DefaultTheme as PaperDefaultTheme,
+  MD3DarkTheme as PaperDarkTheme,
+} from 'react-native-paper';
+import {Appbar, FAB} from 'react-native-paper';
+import {
+  NavigationContainer,
+  DefaultTheme as NavigationDefaultTheme,
+  DarkTheme as NavigationDarkTheme,
+} from '@react-navigation/native';
+import {SafeAreaProvider} from 'react-native-safe-area-context';
 
-/* $FlowFixMe[missing-local-annot] The type annotation(s) required by Flow's
- * LTI update could not be added via codemod */
-const Section = ({children, title}): Node => {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
+import {createDrawerNavigator} from '@react-navigation/drawer';
+import Homescreen from './src/screens/Homescreen';
+import {DrawerContent} from './src/components/DrawerContent';
+
+const CustomDefaultTheme = {
+  ...NavigationDefaultTheme,
+  ...PaperDefaultTheme,
+  colors: {
+    ...NavigationDefaultTheme.colors,
+    ...PaperDefaultTheme.colors,
+    background: '#ffffff',
+    text: '#333333',
+  },
 };
 
-// const App: () => Node = () => {
-//   const isDarkMode = useColorScheme() === 'dark';
+const CustomDarkTheme = {
+  ...NavigationDarkTheme,
+  ...PaperDarkTheme,
+  colors: {
+    ...NavigationDarkTheme.colors,
+    ...PaperDarkTheme.colors,
+    background: '#333333',
+    text: '#ffffff',
+  },
+};
 
-//   const backgroundStyle = {
-//     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-//   };
-
-//   return (
-
-//   );
-// };
+const Drawer = createDrawerNavigator();
 
 export default class App extends React.Component {
+  state = {isDarkTheme: false};
+
+  toggleTheme() {
+    console.log('in toggle Theme');
+    this.setState({isDarkTheme: !this.state.isDarkTheme});
+  }
+
   render() {
+    const theme = this.state.isDarkTheme ? CustomDarkTheme : CustomDefaultTheme;
     return (
-      <SafeAreaView>
-        <StatusBar />
-        <ScrollView contentInsetAdjustmentBehavior="automatic">
-          <Header />
-          <View>
-            <Text>Hello World</Text>
-            <Button
-              title="Crash App"
-              onPress={() => Crashes.generateTestCrash()}
-            />
-          </View>
-        </ScrollView>
-      </SafeAreaView>
+      <PaperProvider theme={theme}>
+        <SafeAreaProvider>
+          <NavigationContainer theme={theme}>
+            <Drawer.Navigator
+              initialRouteName="Home"
+              drawerContent={props => (
+                <DrawerContent
+                  {...props}
+                  isDarkTheme={this.state.isDarkTheme}
+                  toggleTheme={this.toggleTheme.bind(this)}
+                />
+              )}>
+              <Drawer.Screen name="Home" component={Homescreen} />
+              <Drawer.Screen name="Notifications" component={Homescreen} />
+            </Drawer.Navigator>
+          </NavigationContainer>
+        </SafeAreaProvider>
+      </PaperProvider>
     );
   }
 }
 
 const styles = StyleSheet.create({
+  bottom: {
+    backgroundColor: '#eee',
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  fab: {
+    position: 'absolute',
+    right: 16,
+  },
   sectionContainer: {
     marginTop: 32,
     paddingHorizontal: 24,
